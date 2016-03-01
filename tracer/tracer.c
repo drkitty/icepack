@@ -69,15 +69,9 @@ int main(int argc, char** argv)
             wait_for_syscall(pid);
 
             {
-                struct user_regs_struct regs;
-                if (ptrace(PTRACE_GETREGS, pid, NULL, &regs) == -1)
-                    fatal_e(E_RARE, "Can't read registers");
-
-                print_user_regs(pid, &regs);
-
+                struct syscall_info si = get_syscall_info(pid);
+                printf("arg1 = 0x%llx\n", si.args[0]);
             }
-
-            putchar('\n');
 
             wait_for_syscall(pid);
 
@@ -91,7 +85,7 @@ int main(int argc, char** argv)
  *            }
  */
 
-            print("\n--------------------------------\n\n");
+            putchar('\n');
         }
     }
 

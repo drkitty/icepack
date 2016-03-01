@@ -59,7 +59,28 @@ void print_user_regs(pid_t pid, struct user_regs_struct* regs)
     printf("      fs = 0x%llx\n", regs->fs);
     printf("      gs = 0x%llx\n", regs->gs);
 
-    if (regs->orig_rax == __NR_open) {
+    if (regs->orig_rax == __NR_open)
         print_user_string(pid, regs->rdi);
-    }
+}
+
+
+struct syscall_info get_syscall_info(pid_t pid)
+{
+    struct user_regs_struct regs;
+    if (ptrace(PTRACE_GETREGS, pid, NULL, &regs) == -1)
+        fatal_e(E_RARE, "Can't read registers");
+
+    struct syscall_info call = {
+        .num = regs.orig_rax,
+        .args = {
+            regs.rdi,
+            regs.rsi,
+            regs.rdx,
+            regs.r10,
+            regs.r8,
+            regs.r9,
+        },
+    };
+
+    return call;
 }
