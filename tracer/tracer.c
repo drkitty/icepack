@@ -12,23 +12,28 @@
 #include "fail.h"
 
 
-static void wait_for_trap(pid_t pid)
+static bool wait_for_trap(pid_t pid)
 {
     int status;
-    do {
+
+    while (true) {
         pid_t p = waitpid(pid, &status, WUNTRACED);
         if (p == -1)
             fatal(E_RARE, "Can't wait");
-    } while (!(WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP));
+        else if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP)
+            return true;
+        else if (WIFEXITED(status) || WIFSIGNALED(status))
+            return false;
+    }
 }
 
 
-static void wait_for_syscall(pid_t pid)
+static bool wait_for_syscall(pid_t pid)
 {
     if (ptrace(PTRACE_SYSCALL, pid, NULL, 0) == -1)
         fatal_e(E_RARE, "Can't wait for syscall");
 
-    wait_for_trap(pid);
+    return wait_for_trap(pid);
 }
 
 
@@ -67,7 +72,8 @@ int main(int argc, char** argv)
          */
 
         while (true) {
-            wait_for_syscall(pid);
+            if (!wait_for_syscall(pid))
+                break;
 
             {
                 struct syscall_info si = get_syscall_info(pid);
@@ -76,10 +82,13 @@ int main(int argc, char** argv)
                     char buf[256];
                     if (get_user_string(pid, si.args[0], buf, sizeof(buf)))
                         puts(buf);
+                    else
+                        warning("Can't get string");
                 }
             }
 
-            wait_for_syscall(pid);
+            if (!wait_for_syscall(pid))
+                break;
 
 /*
  *            {
