@@ -79,13 +79,11 @@ int main(int argc, char** argv)
                 fatal(E_RARE, "Can't wait");
         } while (!WIFSTOPPED(status));
 
-        /*
-         *{
-         *    int opts = PTRACE_O_EXITKILL;
-         *    if (ptrace(PTRACE_SETOPTIONS, pid, NULL, &opts) == -1)
-         *        fatal_e(E_RARE, "Can't set ptrace options");
-         *}
-         */
+        {
+            int opts = PTRACE_O_EXITKILL;
+            if (ptrace(PTRACE_SETOPTIONS, pid, NULL, opts) == -1)
+                fatal_e(E_RARE, "Can't set ptrace options");
+        }
 
         while (true) {
             if (!wait_for_syscall(pid))
