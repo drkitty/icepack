@@ -6,7 +6,7 @@ MAKEFLAGS += --no-builtin-rules
 
 
 EXE_SRC := tracer.c test.c
-SRC := $(EXE_SRC) fail.c
+SRC := $(EXE_SRC) arch_amd64.c fail.c
 
 OBJ := $(SRC:%.c=%.o)
 EXE := $(EXE_SRC:%.c=%)
@@ -30,11 +30,12 @@ clean:
 	rm -f $(OBJ) $(EXE)
 
 
+arch_amd64.o: arch_generic.h common.h fail.h
 fail.o: common.h fail.h
 test.o: common.h
-tracer.o: common.h fail.h
+tracer.o: arch_generic.h common.h fail.h
 
-tracer: fail.o tracer.o
+tracer: arch_amd64.o fail.o tracer.o
 test: test.o
 
 
