@@ -1,5 +1,6 @@
 #include "common.h"
 
+#include <asm/unistd_64.h>
 #include <stdbool.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>
@@ -71,6 +72,11 @@ int main(int argc, char** argv)
             {
                 struct syscall_info si = get_syscall_info(pid);
                 printf("arg1 = 0x%llx\n", si.args[0]);
+                if (si.num == __NR_open) {
+                    char buf[256];
+                    if (get_user_string(pid, si.args[0], buf, sizeof(buf)))
+                        puts(buf);
+                }
             }
 
             wait_for_syscall(pid);

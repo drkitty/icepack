@@ -9,27 +9,7 @@
 #include "fail.h"
 
 
-static void print_user_string(pid_t pid, unsigned long long int addr)
-{
-    putchar('"');
-    while (true) {
-        long r = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
-        if (r == -1) {
-            warning_e("Can't read memory");
-            return;
-        }
-        r = ((unsigned char)r) & 0xFF;
-        if ((r & 0xFF) == '\0')
-            break;
-        putchar(r);
-        ++addr;
-    }
-
-    print("\"\n");
-}
-
-
-void print_user_regs(pid_t pid, struct user_regs_struct* regs)
+void print_user_regs(struct user_regs_struct* regs)
 {
     printf("     r15 = 0x%llx\n", regs->r15);
     printf("     r14 = 0x%llx\n", regs->r14);
@@ -58,9 +38,6 @@ void print_user_regs(pid_t pid, struct user_regs_struct* regs)
     printf("      es = 0x%llx\n", regs->es);
     printf("      fs = 0x%llx\n", regs->fs);
     printf("      gs = 0x%llx\n", regs->gs);
-
-    if (regs->orig_rax == __NR_open)
-        print_user_string(pid, regs->rdi);
 }
 
 
@@ -83,4 +60,28 @@ struct syscall_info get_syscall_info(pid_t pid)
     };
 
     return call;
+}
+
+
+bool get_user_string(pid_t pid, unsigned long long int addr, char* buf,
+        ssize_t buflen)
+{
+    while (buflen > 0) {
+        long r = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
+        if (r == -1) {
+            warning_e("Can't read memory");
+            return false;
+        }
+
+        *buf = (unsigned char)r & 0xFF;
+        if (*buf == '\0')
+            return true;
+
+        ++addr;
+        ++buf;
+        --buflen;
+    }
+
+    *buf = '\0';
+    return false;
 }
