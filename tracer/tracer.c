@@ -104,16 +104,6 @@ int main(int argc, char** argv)
             if (!wait_for_syscall(pid))
                 break;
 
-/*
- *            {
- *                struct user_regs_struct regs;
- *                if (ptrace(PTRACE_GETREGS, pid, NULL, &regs) == -1)
- *                    fatal_e(E_RARE, "Can't read registers");
- *
- *                print_user_regs(pid, &regs);
- *            }
- */
-
             putchar('\n');
         }
     }
