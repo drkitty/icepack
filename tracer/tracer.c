@@ -1,7 +1,9 @@
 #include "common.h"
 
 #include <asm/unistd_64.h>
+#include <limits.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/user.h>
@@ -39,17 +41,31 @@ static bool wait_for_syscall(pid_t pid)
 
 int main(int argc, char** argv)
 {
-    if (argc < 2)
-        fatal(E_USAGE, "Usage:  tracer PROG [ARGS]...");
+    if (argc < 3)
+        fatal(E_USAGE, "Usage:  tracer ROOTDIR PROG [ARGS]...");
+
+    char* rootdir;
+
+    {
+        rootdir = realpath(argv[1], NULL);
+        if (rootdir == NULL)
+            fatal_e(E_COMMON, "Can't resolve fake root directory");
+        printf("%s\n", rootdir);
+    }
 
     pid_t pid = fork();
     if (pid == -1)
         fatal_e(E_RARE, "Can't fork");
 
     if (pid == 0) {
+        argv[2] = realpath(argv[2], NULL);
+        if (argv[2] == NULL)
+            fatal_e(E_COMMON, "Can't resolve program path");
+
+        chdir(rootdir);
         if (ptrace(PTRACE_TRACEME, -1, NULL, NULL) == -1)
             fatal_e(E_RARE, "Can't request trace");
-        execvp(argv[1], argv + 1);
+        execvp(argv[2], argv + 2);
 
         fatal_e(E_COMMON, "Can't execute program");
     }
@@ -103,6 +119,8 @@ int main(int argc, char** argv)
             putchar('\n');
         }
     }
+
+    free(rootdir);
 
     return 0;
 }
