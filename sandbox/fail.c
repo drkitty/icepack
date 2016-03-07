@@ -47,7 +47,9 @@ void warning_e_(const char* srcname, int line, const char* format, ...)
     (void)srcname; (void)line;
 #endif
     vfprintf(stderr, format, args);
-    fprintf(stderr, " (%s)\n", strerror(errno));
+    if (errno != 0)
+        fprintf(stderr, " (%s)", strerror(errno));
+    fputc('\n', stderr);
 }
 
 
@@ -80,6 +82,8 @@ void fatal_e_(int rtn, const char* srcname, int line,
     (void)srcname; (void)line;
 #endif
     vfprintf(stderr, format, args);
-    fprintf(stderr, " (%s)\n", strerror(errno));
+    if (errno != 0)
+        fprintf(stderr, " (%s)", strerror(errno));
+    fputc('\n', stderr);
     exit(rtn);
 }

@@ -11,3 +11,4 @@
 
 
 #define print(x) fputs((x), stdout)
+#define lengthof(x) (sizeof(x) / sizeof((x)[0]))
