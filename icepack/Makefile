@@ -44,4 +44,4 @@ icepack: fail.o icepack.o $(LUA_SRC)liblua.a
 
 
 $(LUA_SRC)liblua.a:
-	$(MAKE) -C $(LUA_TOP) linux MAKEFLAGS=$(SUBMAKEFLAGS)
+	$(MAKE) -C $(LUA_TOP) linux MAKEFLAGS="$(SUBMAKEFLAGS)"
