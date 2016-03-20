@@ -5,9 +5,7 @@
 #include <unistd.h>
 
 #include "fail.h"
-#include "lauxlib.h"
-#include "lua.h"
-#include "lualib.h"
+#include "igloo.h"
 
 
 int verbosity = 0;
@@ -58,5 +56,7 @@ struct args {
 int main(int argc, char** argv)
 {
     struct args args = get_args(argc, argv);
+    struct igloo_state s = igloo_init();
+    igloo_exec(s, args.name);
     return 0;
 }
