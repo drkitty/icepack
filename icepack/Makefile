@@ -15,7 +15,8 @@ EXE = $(EXE_SRC:%.c=%)
 
 CC = gcc
 CFLAGS = -std=c99 -pedantic -g -Wall -Wextra -Werror \
-	-Wno-unused-function -Wno-unused-parameter -I$(LUA_SRC)
+	-Wno-unused-function -Wno-unused-parameter -Wno-unused-variable \
+	-I$(LUA_SRC)
 
 LUA_TOP = lib/lua-5.3.2/
 LUA_SRC = $(LUA_TOP)src/
