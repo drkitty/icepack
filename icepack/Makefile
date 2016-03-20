@@ -21,12 +21,12 @@ LUA_TOP = lib/lua-5.3.2/
 LUA_SRC = $(LUA_TOP)src/
 
 
-all: $(EXE) $(EXTRA_EXE)
+all: $(EXE)
 
 $(OBJ): $$(patsubst %.o,%.c,$$@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(EXE) $(EXTRA_EXE):
+$(EXE):
 	$(CC) -o $@ $^
 
 $(EXE): $$@.o
