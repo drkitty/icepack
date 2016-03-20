@@ -17,7 +17,8 @@ CC = gcc
 CFLAGS = -std=c99 -pedantic -g -Wall -Wextra -Werror \
 	-Wno-unused-function -Wno-unused-parameter -I$(LUASRC)
 
-LUASRC = lib/lua-5.3.2/src/
+LUATOP = lib/lua-5.3.2/
+LUASRC = $(LUATOP)src/
 
 
 all: $(EXE) $(EXTRA_EXE)
@@ -42,4 +43,4 @@ icepack: fail.o icepack.o $(LUASRC)liblua.a
 
 
 $(LUASRC)liblua.a:
-	$(MAKE) -C $(LUASRC) linux MAKEFLAGS=$(SUBMAKEFLAGS)
+	$(MAKE) -C $(LUATOP) linux MAKEFLAGS=$(SUBMAKEFLAGS)
