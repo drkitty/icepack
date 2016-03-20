@@ -15,10 +15,10 @@ EXE = $(EXE_SRC:%.c=%)
 
 CC = gcc
 CFLAGS = -std=c99 -pedantic -g -Wall -Wextra -Werror \
-	-Wno-unused-function -Wno-unused-parameter -I$(LUASRC)
+	-Wno-unused-function -Wno-unused-parameter -I$(LUA_SRC)
 
-LUATOP = lib/lua-5.3.2/
-LUASRC = $(LUATOP)src/
+LUA_TOP = lib/lua-5.3.2/
+LUA_SRC = $(LUA_TOP)src/
 
 
 all: $(EXE) $(EXTRA_EXE)
@@ -33,14 +33,15 @@ $(EXE): $$@.o
 
 clean:
 	rm -f $(OBJ) $(EXE)
-	$(MAKE) -C $(LUASRC) clean
+	$(MAKE) -C $(LUA_SRC) clean
 
 
 fail.o: common.h fail.h
-icepack.o: common.h fail.h $(LUASRC)lauxlib.h $(LUASRC)lua.h $(LUASRC)lualib.h
+icepack.o: common.h fail.h $(LUA_SRC)lauxlib.h $(LUA_SRC)lua.h \
+	$(LUA_SRC)lualib.h
 
-icepack: fail.o icepack.o $(LUASRC)liblua.a
+icepack: fail.o icepack.o $(LUA_SRC)liblua.a
 
 
-$(LUASRC)liblua.a:
-	$(MAKE) -C $(LUATOP) linux MAKEFLAGS=$(SUBMAKEFLAGS)
+$(LUA_SRC)liblua.a:
+	$(MAKE) -C $(LUA_TOP) linux MAKEFLAGS=$(SUBMAKEFLAGS)
