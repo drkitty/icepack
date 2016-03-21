@@ -30,8 +30,17 @@ static void require_standard(lua_State* L)
 
 static void ipak_set_hash(struct ipak* p, const char* full_name)
 {
-    for (unsigned int i = 0; i < HASH_LEN; ++i)
+    unsigned int i;
+    for (i = 0; i < HASH_LEN && full_name[i] != '\0'; ++i)
         p->hash[i] = full_name[i];
+    for (/* */; i < HASH_LEN; ++i)
+        p->hash[i] = '\0';
+    if (verbosity >= 2) {
+        print("Hash is ");
+        for (i = 0; i < HASH_LEN; ++i)
+            printf("%02x", p->hash[i]);
+        print("\n");
+    }
 }
 
 
