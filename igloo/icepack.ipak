@@ -1,0 +1,45 @@
+Object = {}
+function Object:__call(child)
+    child = child or {}
+    setmetatable(child, self)
+    child.__index = self
+    return child
+end
+setmetatable(Object, Object)
+
+
+function merge(x, ...)
+    for i, y in ipairs(table.pack(...)) do
+        for key, val in pairs(y) do
+            x[key] = val
+        end
+    end
+end
+
+
+Package = Object()
+GitRepo = Object()
+
+
+return Package{
+    name = "icepack",
+    upstream = {
+        info = "https://github.com/drkitty/icepack",
+        version = nil,
+        files = GitRepo{
+            clone = "git@github.com:drkitty/icepack.git",
+            checkout = "master",
+        },
+    },
+    children = {
+        Package{
+            name = "igloo",
+            build_deps = {
+                "icepack.bootstrap",
+            },
+            run_deps = {
+                "icepack.bootstrap",
+            },
+        },
+    },
+}

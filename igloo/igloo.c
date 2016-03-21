@@ -28,18 +28,34 @@ static void require_standard(lua_State* L)
 }
 
 
-struct igloo_state igloo_init()
+static void ipak_set_hash(struct ipak* p, const char* full_name)
 {
-    struct igloo_state s;
-    s.L = luaL_newstate();
-    require_standard(s.L);
-    return s;
+    for (unsigned int i = 0; i < HASH_LEN; ++i)
+        p->hash[i] = full_name[i];
 }
 
 
-void igloo_exec(struct igloo_state s, const char* name)
+void ipak_load(struct ipak* p, const char* name)
 {
-    int ret = luaL_dofile(s.L, name);
-    if (ret != 0)
-        fatal(E_COMMON, lua_tostring(s.L, -1));
+    p->L = luaL_newstate();
+    require_standard(p->L);
+
+    int idx = lua_gettop(p->L);
+    int ret = luaL_dofile(p->L, name);
+    if (ret != LUA_OK)
+        fatal(E_COMMON, lua_tostring(p->L, -1));
+    int count = lua_gettop(p->L) - idx;
+    if (count != 1)
+        fatal(E_COMMON, "'%s' returned %d values, not 1", name, count);
+    if (lua_type(p->L, -1) != LUA_TTABLE)
+        fatal(E_COMMON, "'%s' did not return a table");
+
+    if (lua_getfield(p->L, -1, "name") != LUA_TSTRING)
+        fatal(E_COMMON, "Invalid name");
+    {
+        const char* pkgname = lua_tostring(p->L, -1);
+        v2("Package name is '%s'", pkgname);
+        ipak_set_hash(p, pkgname);
+    }
+    lua_pop(p->L, 1);
 }

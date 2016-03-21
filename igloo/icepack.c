@@ -56,7 +56,7 @@ struct args {
 int main(int argc, char** argv)
 {
     struct args args = get_args(argc, argv);
-    struct igloo_state s = igloo_init();
-    igloo_exec(s, args.name);
+    struct ipak p;
+    ipak_load(&p, args.name);
     return 0;
 }

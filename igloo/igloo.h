@@ -3,14 +3,19 @@
 
 #include "common.h"
 
+#include <stdint.h>
+
 #include "lua.h"
 
 
-struct igloo_state {
+#define HASH_LEN 32
+
+
+struct ipak {
+    uint8_t hash[HASH_LEN];
     lua_State* L;
+    struct ipak* parent;
 };
 
 
-struct igloo_state igloo_init();
-
-void igloo_exec(struct igloo_state s, const char* name);
+void ipak_load(struct ipak* p, const char* name);
