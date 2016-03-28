@@ -63,6 +63,8 @@ static void exit_with_usage()
         "  -h   Show this usage message\n"
         "  -v   Increase verbosity\n"
     );
+
+    exit(E_USAGE);
 }
 
 
